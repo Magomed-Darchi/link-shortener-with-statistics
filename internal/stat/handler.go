@@ -3,14 +3,14 @@ package stat
 import (
 	"api-main/configs"
 	"api-main/pkg/midlleware"
-	"fmt"
+	"api-main/pkg/res"
 	"net/http"
 	"time"
 )
 
 const (
-	FilterbyDay   = "day"
-	FilterbyMonth = "month"
+	GroupByDay   = "day"
+	GroupByMonth = "month"
 )
 
 type StatkHandler struct {
@@ -44,11 +44,12 @@ func (h *StatkHandler) GetStat() http.HandlerFunc {
 			return
 		}
 		by := r.URL.Query().Get("by")
-		if by != FilterbyDay && by != FilterbyMonth {
+		if by != GroupByDay && by != GroupByMonth {
 			http.Error(w, "Invalid by params", http.StatusBadRequest)
 			return
 		}
-		fmt.Println(from, to, by)
+		stats := h.StatRepository.GetStat(by, from, to)
+		res.Json(w, stats, 200)
 	}
 
 }
